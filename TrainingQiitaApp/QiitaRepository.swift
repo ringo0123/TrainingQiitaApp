@@ -8,9 +8,9 @@
 import Foundation
 import Combine
 
-final class QiitaRepository {
+final class QiitaRepository: QiitaRepositoryProtocol {
     
-    func fetchAuthenticatedUser(token: String, completion: @escaping (Result<User, Error>) -> Void) {
+    func fetchUser(token: String, completion: @escaping (Result<User, Error>) -> Void) {
         let url = URL(string: "https://qiita.com/api/v2/authenticated_user")!
         var request = URLRequest(url: url)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -43,4 +43,8 @@ final class QiitaRepository {
             }
         }.resume()
     }
+}
+
+protocol QiitaRepositoryProtocol {
+    func fetchUser(token: String, completion: @escaping (Result<User, Error>) -> Void)
 }

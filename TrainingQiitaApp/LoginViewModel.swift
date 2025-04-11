@@ -15,7 +15,11 @@ class LoginViewModel: ObservableObject {
     
     @Published var user: User?
     
-    private let repository = QiitaRepository()
+    private let repository: QiitaRepositoryProtocol
+
+    init(repository: QiitaRepositoryProtocol = QiitaRepository()) {
+        self.repository = repository
+    }
 
     enum LoginStatus {
         case idle
@@ -35,7 +39,7 @@ class LoginViewModel: ObservableObject {
         errorMessage = nil
 
         // APIリクエスト（簡易バージョン）
-        repository.fetchAuthenticatedUser(token: accessToken) { [weak self] result in
+        repository.fetchUser(token: accessToken) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let user):
