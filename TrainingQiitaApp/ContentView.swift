@@ -8,8 +8,15 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var viewModel = LoginViewModel()
+    
     var body: some View {
-        LoginView()
+        switch viewModel.loginStatus {
+        case .idle, .loading, .failure:
+            LoginView(viewModel: viewModel)
+        case .success:
+            HomeView(viewModel: viewModel)
+        }
     }
 }
 
