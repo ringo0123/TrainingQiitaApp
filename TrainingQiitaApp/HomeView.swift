@@ -16,7 +16,8 @@ struct HomeView: View {
         "テスト2",
         "テスト3",
         "テスト4",
-        "テスト5"
+        "テスト5",
+        "テスト6",
     ]
     
     var body: some View {
