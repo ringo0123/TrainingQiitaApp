@@ -18,3 +18,11 @@ struct User: Decodable {
         case profileImageUrl = "profile_image_url"
     }
 }
+
+struct Article: Decodable, Identifiable {
+    let id: String
+    let title: String
+    let url: String
+    let body: String? 
+    let user: User
+}
