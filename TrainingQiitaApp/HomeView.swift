@@ -52,14 +52,16 @@ struct HomeView: View {
                 }
 
                 List(searchViewModel.articles) { article in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(article.title)
-                            .font(.headline)
-                        Text("by \(article.user.id)")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
+                    NavigationLink(destination: ArticleDetailView(article: article)) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(article.title)
+                                .font(.headline)
+                            Text("by \(article.user.id)")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
                 }
                 .listStyle(.plain)
                 
