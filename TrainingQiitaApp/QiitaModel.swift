@@ -26,3 +26,25 @@ struct Article: Decodable, Identifiable {
     let body: String? 
     let user: User
 }
+
+enum MarkdownLine: Identifiable {
+    case text(String)
+    case heading1(String)
+    case heading2(String)
+    case heading3(String)
+    case heading4(String)
+    case codeBlock(String)
+    case image(URL)
+    case link(URL)
+    
+    var id: UUID {
+        return UUID()
+    }
+}
+
+extension Article {
+    var parsedBody: [MarkdownLine] {
+        guard let body = self.body else { return [] }
+        return parseMarkdownBody(body)
+    }
+}
