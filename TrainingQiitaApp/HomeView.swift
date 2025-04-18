@@ -11,6 +11,8 @@ struct HomeView: View {
     @ObservedObject var viewModel: LoginViewModel
     @StateObject private var searchViewModel = ArticlesSearchViewModel()
     
+    @State private var isAccountMenuPresented = false
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -44,13 +46,13 @@ struct HomeView: View {
                     ProgressView("読み込み中...")
                         .padding()
                 }
-
+                
                 if let error = viewModel.errorMessage {
                     Text(error)
                         .foregroundColor(.red)
                         .padding(.bottom, 8)
                 }
-
+                
                 List(searchViewModel.articles) { article in
                     NavigationLink(destination: ArticleDetailView(title: article.title,parsedBody: article.parsedBody)) {
                         VStack(alignment: .leading, spacing: 4) {
@@ -67,11 +69,6 @@ struct HomeView: View {
                 
                 Spacer()
                 
-                Button("ログアウト") {
-                    viewModel.loginStatus = .idle
-                    viewModel.accessToken = ""
-                    viewModel.user = nil
-                }
             }
             .padding()
             .navigationTitle("Qiita")
@@ -86,13 +83,34 @@ struct HomeView: View {
                                 .scaledToFill()
                                 .frame(width: 32, height: 32)
                                 .clipShape(Circle())
+                                .onTapGesture {
+                                    isAccountMenuPresented = true
+                                }
                         } placeholder: {
                             ProgressView()
+                                .frame(width: 32, height: 32)
+                                .onTapGesture {
+                                    isAccountMenuPresented = true
+                                }
                         }
+                    } else {
+                        Image(systemName: "person.circle.fill")
+                            .resizable()
+                            .frame(width: 32, height: 32)
+                            .clipShape(Circle())
+                            .onTapGesture {
+                                isAccountMenuPresented = true
+                            }
                     }
                 }
             }
+            .fullScreenCover(isPresented: $isAccountMenuPresented) {
+                AccountMenuView(viewModel: viewModel){
+                    isAccountMenuPresented = false
+                }
+            }
         }
+        
     }
 }
 
