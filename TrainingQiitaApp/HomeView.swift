@@ -9,29 +9,62 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var viewModel: LoginViewModel
-    @State private var searchText = ""
-    
-    @State private var dummyArticles = [
-        "テスト1",
-        "テスト2",
-        "テスト3",
-        "テスト4",
-        "テスト5"
-    ]
+    @StateObject private var searchViewModel = ArticlesSearchViewModel()
     
     var body: some View {
         NavigationStack {
             VStack {
-                TextField("記事を検索", text: $searchText)
-                    .padding(10)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(10)
+                HStack {
+                    TextField("記事を検索", text: $searchViewModel.searchText)
+                        .frame(height: 28)
+                        .padding(10)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(10)
+                        .submitLabel(.search)
+                        .onSubmit {
+                            searchViewModel.searchArticles()
+                        }
+                    
+                    Button(action: {
+                        searchViewModel.searchArticles()
+                    }) {
+                        Text("検索")
+                            .frame(height: 28)
+                            .font(.title3)
+                            .padding(10)
+                            .padding(.horizontal,10)
+                            .background(searchViewModel.searchText.isEmpty ? .gray : .green)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                    .disabled(searchViewModel.searchText.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
                 
-                List(dummyArticles, id: \.self) { article in
-                    Text(article)
+                if searchViewModel.isLoading {
+                    ProgressView("読み込み中...")
+                        .padding()
+                }
+
+                if let error = viewModel.errorMessage {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .padding(.bottom, 8)
+                }
+
+                List(searchViewModel.articles) { article in
+                    NavigationLink(destination: ArticleDetailView(article: article)) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(article.title)
+                                .font(.headline)
+                            Text("by \(article.user.id)")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+                        .padding(.vertical, 4)
+                    }
                 }
                 .listStyle(.plain)
-
+                
                 Spacer()
                 
                 Button("ログアウト") {
