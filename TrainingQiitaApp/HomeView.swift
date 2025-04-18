@@ -53,6 +53,7 @@ struct HomeView: View {
 
                 List(searchViewModel.articles) { article in
                     NavigationLink(destination: ArticleDetailView(title: article.title,parsedBody: article.parsedBody)) {
+
                         VStack(alignment: .leading, spacing: 4) {
                             Text(article.title)
                                 .font(.headline)
