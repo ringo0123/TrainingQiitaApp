@@ -9,51 +9,76 @@ import SwiftUI
 
 struct ArticleDetailView: View {
     @Environment(\.dismiss) var dismiss
-    let article: Article
+    
+    let title: String
+    let parsedBody: [MarkdownLine]
     
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 4) {
-                let cleanedBody = article.body?.replacingOccurrences(of: "<br>", with: "") ?? ""
-                let lines = cleanedBody.components(separatedBy: "\n")
-                
-                ForEach(lines, id: \.self) { line in
-                    if line.starts(with: "## ") {
+                ForEach(parsedBody) { line in
+                    switch line {
+                    case .heading1(let text):
                         VStack(alignment: .leading, spacing: 0) {
-                            Text(line.replacingOccurrences(of: "## ", with: ""))
-                                .font(.title)
+                            Text(text)
+                                .font(.largeTitle)
                                 .fontWeight(.bold)
-                                .padding(.vertical,4)
+                                .padding(.vertical, 8)
+                            
                             Divider()
                                 .padding(.bottom, 12)
                         }
-                    }
-                    else if line.starts(with: "#### ") {
-                        Text(line.replacingOccurrences(of: "#### ", with: ""))
-                            .font(.title2)
-                            .padding(.bottom, 8)
-                    }
-                    else if line.contains("<img src=") {
-                        // 正規表現 or シンプルな分割でURLを取り出す
-                        if let urlStart = line.range(of: "src=\"")?.upperBound,
-                           let urlEnd = line[urlStart...].range(of: "\"")?.lowerBound {
+
+                    case .heading2(let text):
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text(text)
+                                .font(.title)
+                                .fontWeight(.semibold)
+                                .padding(.vertical, 6)
                             
-                            let urlString = String(line[urlStart..<urlEnd])
-                            
-                            if let url = URL(string: urlString) {
-                                AsyncImage(url: url) { image in
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .cornerRadius(8)
-                                } placeholder: {
-                                    ProgressView()
-                                }
-                            }
+                            Divider()
+                                .padding(.bottom, 12)
                         }
-                    }
-                    else {
-                        Text(line)
+
+                    case .heading3(let text):
+                        Text(text)
+                            .font(.title2)
+                            .fontWeight(.medium)
+                            .padding(.vertical, 4)
+
+                    case .heading4(let text):
+                        Text(text)
+                            .font(.headline)
+                            .padding(.bottom, 2)
+                        
+                    case .codeBlock(let code):
+                        Text(code)
+                            .font(.system(.body, design: .monospaced))
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(8)
+                        
+                    case .image(let url):
+                        AsyncImage(url: url) { image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .cornerRadius(8)
+                        } placeholder: {
+                            ProgressView()
+                        }
+                        
+                    case .link(let url):
+                        Link(destination: url) {
+                            Text(url.absoluteString)
+                                .foregroundColor(.blue)
+                                .underline()
+                                .font(.body)
+                        }
+
+                    case .text(let text):
+                        Text(text)
                             .font(.body)
                     }
                 }
@@ -82,16 +107,9 @@ struct ArticleDetailView: View {
 
 #Preview {
     NavigationStack {
-        ArticleDetailView(article: Article(
-            id: "id",
+        ArticleDetailView(
             title: "タイトル",
-            url: "https://example.com/article",
-            body: "本文がここに表示されます",
-            user: User(
-                id: "id",
-                name: "SwiftUI",
-                profileImageUrl: nil
-            )
-        ))
+            parsedBody: []
+        )
     }
 }
