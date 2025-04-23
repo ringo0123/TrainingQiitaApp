@@ -55,4 +55,11 @@ class LoginViewModel: ObservableObject {
             }
         }
     }
+    
+    func logout() {
+        self.user = nil
+        self.accessToken = ""
+        self.loginStatus = .idle
+    }
+    
 }
