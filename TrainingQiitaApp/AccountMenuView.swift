@@ -66,16 +66,10 @@ struct AccountMenuView: View {
                 .alert("ログアウトしますか？", isPresented: $showLogoutAlert) {
                     Button("キャンセル", role: .cancel) {}
                     Button("ログアウト", role: .destructive) {
-                        viewModel.user = nil
-                        viewModel.accessToken = ""
-                        viewModel.loginStatus = .idle
+                        viewModel.logout()
                     }
                 }
             }
         }
     }
-}
-
-#Preview {
-   // AccountMenuView()
 }
