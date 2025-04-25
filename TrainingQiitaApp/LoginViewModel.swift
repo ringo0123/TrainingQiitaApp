@@ -62,4 +62,8 @@ class LoginViewModel: ObservableObject {
         self.loginStatus = .idle
     }
     
+    func loginStatusReset() {
+        self.loginStatus = .idle
+    }
+    
 }
