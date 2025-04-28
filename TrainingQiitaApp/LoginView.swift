@@ -37,9 +37,7 @@ struct LoginView: View {
         }
         .padding()
         .onChange(of: viewModel.loginStatus) {
-            if viewModel.loginStatus == .failure {
-                showAlert = true
-            }
+            showAlert = viewModel.loginStatus == .failure
         }
         .alert("エラー", isPresented: $showAlert) {
             Button("OK") {
