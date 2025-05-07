@@ -35,11 +35,11 @@ struct HomeView: View {
                             .font(.title3)
                             .padding(10)
                             .padding(.horizontal,10)
-                            .background(searchViewModel.searchText.isEmpty ? .gray : .green)
+                            .background(searchViewModel.searchText.isEmpty || searchViewModel.isLoading ? .gray : .green)
                             .foregroundColor(.white)
                             .cornerRadius(10)
                     }
-                    .disabled(searchViewModel.searchText.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .disabled(searchViewModel.searchText.trimmingCharacters(in: .whitespaces).isEmpty || searchViewModel.isLoading)
                 }
                 
                 if searchViewModel.isLoading {
@@ -47,26 +47,31 @@ struct HomeView: View {
                         .padding()
                 }
                 
-                if let error = viewModel.errorMessage {
+                else if let error = searchViewModel.errorMessage {
                     Text(error)
                         .foregroundColor(.red)
                         .padding(.bottom, 8)
                 }
-                
-                List(searchViewModel.articles) { article in
-                    NavigationLink(destination: ArticleDetailView(title: article.title,parsedBody: article.parsedBody)) {
+                else if searchViewModel.hasSearched && searchViewModel.articles.isEmpty {
+                    Text("検索結果が見つかりませんでした。")
+                        .foregroundColor(.gray)
+                        .padding()
+                } else {
+                    List(searchViewModel.articles) { article in
+                        NavigationLink(destination: ArticleDetailView(title: article.title,parsedBody: article.parsedBody)) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(article.title)
+                                    .font(.headline)
+                                Text("by \(article.user.id)")
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            }
+                            .padding(.vertical, 4)
 
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(article.title)
-                                .font(.headline)
-                            Text("by \(article.user.id)")
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
                         }
-                        .padding(.vertical, 4)
                     }
+                    .listStyle(.plain)
                 }
-                .listStyle(.plain)
                 
                 Spacer()
                 
