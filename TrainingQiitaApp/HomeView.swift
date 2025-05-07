@@ -67,6 +67,7 @@ struct HomeView: View {
                                     .foregroundColor(.gray)
                             }
                             .padding(.vertical, 4)
+
                         }
                     }
                     .listStyle(.plain)

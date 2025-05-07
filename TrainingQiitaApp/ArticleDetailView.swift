@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ArticleDetailView: View {
     @Environment(\.dismiss) var dismiss
+    
     let title: String
     let parsedBody: [MarkdownLine]
     
