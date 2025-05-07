@@ -9,45 +9,45 @@ import SwiftUI
 
 struct LoginView: View {
     @ObservedObject var viewModel: LoginViewModel
-
-        var body: some View {
-            VStack(spacing: 24) {
-                Text("Qiitaへログイン")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-
-                TextField("アクセストークンを入力", text: $viewModel.accessToken)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.horizontal)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-
-                Button("ログイン") {
-                    viewModel.login()
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.green)
-                .foregroundColor(.white)
-                .cornerRadius(8)
+    
+    @State private var showAlert = false
+    
+    var body: some View {
+        VStack(spacing: 24) {
+            Text("Qiitaへログイン")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+            
+            TextField("アクセストークンを入力", text: $viewModel.accessToken)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.horizontal)
-
-                // ログイン状態に応じた表示
-                if viewModel.loginStatus == .loading {
-                    ProgressView()
-                } else if viewModel.loginStatus == .failure {
-                    Text(viewModel.errorMessage ?? "エラーが発生しました")
-                        .foregroundColor(.red)
-                } else if viewModel.loginStatus == .success {
-                    Text("ログイン成功！\(viewModel.user?.name ?? "不明")")
-                        .foregroundColor(.blue)
-                } else {
-                    Text(" ")
-                        .frame(maxWidth: .infinity)
-                }
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+            
+            Button("ログイン") {
+                viewModel.login()
             }
+            .frame(maxWidth: .infinity)
             .padding()
-        }}
+            .disabled(viewModel.loginStatus != .idle)
+            .background(viewModel.loginStatus == .idle ? .green : .gray)
+            .foregroundColor(.white)
+            .cornerRadius(8)
+            .padding(.horizontal)
+        }
+        .padding()
+        .onChange(of: viewModel.loginStatus) {
+            showAlert = viewModel.loginStatus == .failure
+        }
+        .alert("エラー", isPresented: $showAlert) {
+            Button("OK") {
+                viewModel.loginStatusReset()
+            }
+        } message: {
+            Text(viewModel.errorMessage ?? "エラーが発生しました")
+        }
+    }
+}
 
 #Preview {
     LoginView(viewModel: LoginViewModel())
