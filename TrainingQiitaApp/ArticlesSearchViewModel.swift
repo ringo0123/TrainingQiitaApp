@@ -12,6 +12,7 @@ final class ArticlesSearchViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published var articles: [Article] = []
     @Published var isLoading: Bool = false
+    @Published var hasSearched = false
     @Published var errorMessage: String?
     
     private let repository: ArticlesSearchRepositoryProtocol
@@ -27,8 +28,8 @@ final class ArticlesSearchViewModel: ObservableObject {
             return
         }
         
-        isLoading = true
-        errorMessage = nil
+        self.isLoading = true
+        self.errorMessage = nil
         
         repository.searchArticles(query: trimmedQuery) { [weak self] result in
             DispatchQueue.main.async {
@@ -36,8 +37,9 @@ final class ArticlesSearchViewModel: ObservableObject {
                 switch result {
                 case .success(let articles):
                     self?.articles = articles
+                    self?.hasSearched = true
                 case .failure(let error):
-                    self?.errorMessage = "検索に失敗しました: \(error.localizedDescription)"
+                    self?.errorMessage = error.localizedDescription
                 }
             }
         }
